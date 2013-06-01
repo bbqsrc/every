@@ -1,6 +1,6 @@
 # Every
 
-Run a method at a set interval.
+Run a method at a set interval. (Python 3 only)
 
 ## Usage
 
@@ -25,6 +25,13 @@ x.join()
 # .join(stop=False) works like an ordinary thread: wait until thread finishes, then end
 y.join(stop=False)
 ```
+
+## Tests
+
+Tests use [Simple BDD](http://brendan.so/projects/simplebdd).
+
+    $ pip install simplebdd termcolor
+    $ simplebdd tests.py
 
 ## License
 
