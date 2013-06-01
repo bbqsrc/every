@@ -5,8 +5,9 @@ from threading import Thread
 class Every(Thread):
     def __init__(self, *args, **kwargs):
         Thread.__init__(self, *args, **kwargs)
-        self.amount = None
+        self._repr_amt = None
         self.period = None
+        self.joined = False
 
     def run(self, *args, **kwargs):
         if self._target is None:
@@ -21,15 +22,17 @@ class Every(Thread):
                     immediate = True
                 else:
                     self._target(*self._args, **self._kwargs)
+                if self.joined:
+                    break
             finally:
                 while future > time.time():
-                    if self.looping:
+                    if self.looping and not self.joined:
                         time.sleep(1)
                     else:
                         break
 
     def every(self, amount, period="seconds", immediate=True):
-        self.amount = amount
+        self._repr_amt = amount
 
         if period == "seconds":
             pass
@@ -42,6 +45,7 @@ class Every(Thread):
         else:
             raise Exception("invalid period")
 
+        self.amount = amount
         self.period = period
         self.looping = True
         self.immediate = immediate
@@ -49,6 +53,7 @@ class Every(Thread):
         return self
 
     def join(self, timeout=None, stop=True):
+        self.joined = True
         self.looping = not stop
         return Thread.join(self, timeout)
 
@@ -63,8 +68,8 @@ class Every(Thread):
             status += " daemon"
         if self._ident is not None:
             status += " %s" % self._ident
-        if self.amount and self.period:
-            status += ", every %s %s" % (self.amount, self.period)
+        if self._repr_amt and self.period:
+            status += ", every %s %s" % (self._repr_amt, self.period)
 
         return "<%s (%s, %s)>" % (self.__class__.__name__, self._name, status)
 
